@@ -43,7 +43,7 @@ public class Doodle {
         return new Rectangle(x,y,width,height);
     }
 
-    private void setXloc(double x) {
+    private void setXLocation(double x) {
         this.doodle.setX(x);
         this.doodleLeftEye.setCenterX(x + Constants.LEFT_EYE_OFFSET);
         this.doodleRightEye.setCenterX(x + Constants.RIGHT_EYE_OFFSET);
@@ -51,7 +51,7 @@ public class Doodle {
         this.doodleRightEyeBrow.setX(x + Constants.RIGHT_EYE_BROW_OFFSET);
     }
 
-    private void setYloc(double y) {
+    private void setYLocation(double y) {
         this.doodle.setY(y);
         this.doodleLeftEye.setCenterY(y + Constants.EYE_OFFSET_Y);
         this.doodleRightEye.setCenterY(y + Constants.EYE_OFFSET_Y);
@@ -61,7 +61,7 @@ public class Doodle {
 
     public void doodleFall() {
         double doodleY = this.doodle.getY();
-        this.setYloc(doodleY);
+        this.setYLocation(doodleY);
 
         double updatedVelocity = this.currentVelocity + Constants.GRAVITY * Constants.DURATION;
         double updatedPosition = this.currentPosition + updatedVelocity * Constants.DURATION;
@@ -72,27 +72,27 @@ public class Doodle {
         this.currentPosition = updatedPosition;
     }
 
-    private double getXLoc() {
+    private double getXLocation() {
         return this.doodle.getX();
     }
 
     public void moveLeft(){
-        this.setXloc(this.doodle.getX() - Constants.DISTANCE_X);
+        this.setXLocation(this.doodle.getX() - Constants.DISTANCE_X);
 
     }
 
     public void moveRight(){
-        this.setXloc(this.doodle.getX() + Constants.DISTANCE_X);
+        this.setXLocation(this.doodle.getX() + Constants.DISTANCE_X);
     }
 
     public void rebound(){
         this.currentVelocity = Constants.REBOUND_VELOCITY;
     }
-    public void resetPos(){
-        if (this.getXLoc() > Constants.SCENE_WIDTH - (double) Constants.DOODLE_WIDTH /2){
+    public void resetPosition(){
+        if (this.getXLocation() > Constants.SCENE_WIDTH - (double) Constants.DOODLE_WIDTH /2){
             this.doodle.setX((double) -Constants.DOODLE_WIDTH /2);
         }
-        if (this.getXLoc() < -(double) Constants.DOODLE_WIDTH /2){
+        if (this.getXLocation() < -(double) Constants.DOODLE_WIDTH /2){
             this.doodle.setX(Constants.SCENE_WIDTH - (double) Constants.DOODLE_WIDTH /2);
         }
     }
@@ -136,4 +136,5 @@ public class Doodle {
             }
         }
     }
+
 }
