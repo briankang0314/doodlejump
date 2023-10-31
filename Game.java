@@ -9,13 +9,17 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import javafx.event.ActionEvent;
 import javafx.scene.input.KeyEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Game {
     private Doodle doodle;
-    private Platform standardPlatform;
+    private List<Platform> platforms;
 
     public Game(BorderPane root, Pane doodlePane) {
         this.doodle = new Doodle(root, doodlePane);
-        this.standardPlatform = new Platform(root, doodlePane);
+        this.platforms = new ArrayList<>();
         root.setOnKeyPressed(this::handleKeyPress);
 
         this.startTimeline();
@@ -40,20 +44,12 @@ public class Game {
         KeyFrame kf = new KeyFrame(Duration.millis(50),
                 (ActionEvent e) -> {
                     this.doodle.doodleFall();
-                    this.doodle.resetPos();
+                    this.doodle.resetPosition();
 
-                    double platformX = standardPlatform.getX();
-                    double platformY = standardPlatform.getY();
-                    double platformWidth = standardPlatform.getWidth();
-                    double platformHeight = standardPlatform.getHeight();
-
-                    boolean collisionDetected = this.doodle.intersects(platformX, platformY,
-                            platformWidth, platformHeight);
-
-                    if (collisionDetected) {
-                        this.doodle.rebound();
+                    for (Platform platform : platforms) {
+                        platform.update();
+                        this.doodle.checkCollisionWithPlatform(platform);
                     }
-
                 });
         Timeline timeline = new Timeline(kf);
         timeline.setCycleCount(Animation.INDEFINITE);
