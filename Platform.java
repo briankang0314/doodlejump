@@ -57,6 +57,10 @@ public class Platform {
         return this.platform.getY();
     }
 
+    public void setY(double y) {
+        this.platform.setY(y);
+    }
+
     public double getWidth() {
         return this.platform.getWidth();
     }
@@ -87,5 +91,19 @@ public class Platform {
 
     public void hide() {
         doodlePane.getChildren().remove(this.platform);
+    }
+
+    public static PlatformType getRandomPlatformType() {
+        PlatformType[] types = PlatformType.values();
+        int randomIndex = (int) (Math.random() * types.length);
+        return types[randomIndex];
+    }
+
+    public void removeFromPane() {
+        this.doodlePane.getChildren().remove(this.platform);
+    }
+
+    public Rectangle getShape() {
+        return this.platform;
     }
 }
