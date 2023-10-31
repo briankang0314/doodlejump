@@ -115,4 +115,25 @@ public class Doodle {
 
         else return false;
     }
+
+    public void checkCollisionWithPlatform(Platform platform) {
+        if (this.intersects(platform.getX(), platform.getY(), platform.getWidth(), platform.getHeight())) {
+            switch (platform.getType()) {
+                case STANDARD:
+                    this.currentVelocity = Constants.REBOUND_VELOCITY;
+                    break;
+                case DISAPPEARING:
+                    this.currentVelocity = Constants.REBOUND_VELOCITY;
+                    platform.hide(); // Implement this method to hide the platform
+                    break;
+                case EXTRA_BOUNCY:
+                    this.currentVelocity = Constants.BOUNCY_REBOUND_VELOCITY;
+                    break;
+                case MOVING:
+                    // Handle moving platform collision
+                    this.currentVelocity = Constants.REBOUND_VELOCITY;
+                    break;
+            }
+        }
+    }
 }
