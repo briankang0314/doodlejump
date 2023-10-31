@@ -3,31 +3,66 @@ package doodlejump;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 
 public class Platform {
-    private Rectangle standardPlatform;
+    private Rectangle platform;
+    private PlatformType type;
+    private Pane doodlePane;
 
-    public Platform(BorderPane root, Pane doodlePane){
-        this.standardPlatform = new Rectangle(180,500,
-                Constants.PLATFORM_WIDTH,Constants.PLATFORM_HEIGHT);
+    public Platform(BorderPane root, Pane doodlePane, double x, double y, PlatformType type) {
+        this.doodlePane = doodlePane;
+        this.type = type;
+        this.platform = new Rectangle(x, y, Constants.PLATFORM_WIDTH, Constants.PLATFORM_HEIGHT);
+        setColorBasedOnType();
+        doodlePane.getChildren().add(this.platform);
+    }
 
-        doodlePane.getChildren().add(this.standardPlatform);
+    private void setColorBasedOnType() {
+        switch (type) {
+            case STANDARD:
+                platform.setFill(Color.GRAY);
+                break;
+            case DISAPPEARING:
+                platform.setFill(Color.RED);
+                break;
+            case EXTRA_BOUNCY:
+                platform.setFill(Color.GREEN);
+                break;
+            case MOVING:
+                platform.setFill(Color.BLUE);
+                break;
+        }
+    }
+
+    public PlatformType getType() {
+        return type;
     }
 
     public double getX() {
-        return this.standardPlatform.getX();
+        return this.platform.getX();
     }
 
     public double getY() {
-        return this.standardPlatform.getY();
+        return this.platform.getY();
     }
 
     public double getWidth() {
-        return this.standardPlatform.getWidth();
+        return this.platform.getWidth();
     }
 
     public double getHeight() {
-        return this.standardPlatform.getHeight();
+        return this.platform.getHeight();
     }
 
+    public enum PlatformType {
+        STANDARD,
+        DISAPPEARING,
+        EXTRA_BOUNCY,
+        MOVING
+    }
+
+    public void hide() {
+        doodlePane.getChildren().remove(this.platform);
+    }
 }
