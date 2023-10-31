@@ -9,6 +9,10 @@ public class Platform {
     private Rectangle platform;
     private PlatformType type;
     private Pane doodlePane;
+    private double deltaX;
+    private double minX;
+    private double maxX;
+
 
     public Platform(BorderPane root, Pane doodlePane, double x, double y, PlatformType type) {
         this.doodlePane = doodlePane;
@@ -16,6 +20,12 @@ public class Platform {
         this.platform = new Rectangle(x, y, Constants.PLATFORM_WIDTH, Constants.PLATFORM_HEIGHT);
         setColorBasedOnType();
         doodlePane.getChildren().add(this.platform);
+
+        if (type == PlatformType.MOVING) {
+            this.deltaX = Constants.PLATFORM_MOVING_SPEED;
+            this.minX = 0;
+            this.maxX = Constants.SCENE_WIDTH - Constants.PLATFORM_WIDTH;
+        }
     }
 
     private void setColorBasedOnType() {
@@ -60,6 +70,19 @@ public class Platform {
         DISAPPEARING,
         EXTRA_BOUNCY,
         MOVING
+    }
+
+    public void update() {
+        if (this.type == PlatformType.MOVING) {
+            double newX = this.platform.getX() + this.deltaX;
+
+            if (newX > maxX || newX < minX) {
+                this.deltaX = -this.deltaX;
+                newX = Math.min(Math.max(newX, minX), maxX);
+            }
+
+            this.platform.setX(newX);
+        }
     }
 
     public void hide() {
