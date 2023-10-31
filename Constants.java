@@ -26,9 +26,13 @@ public class Constants {
     public static final int BOUNCY_REBOUND_VELOCITY = -1200; //bouncy platform initial jump velocity (UNITS: pixels/s)
     public static final double DURATION = 0.016; // KeyFrame duration (UNITS: s)
     public static final double DISTANCE_X = 10;
+    public static final int GAME_OVER_Y_THRESHOLD = 700;
 
     public static final int PLATFORM_WIDTH = 40; // (UNITS: pixels)
     public static final int PLATFORM_HEIGHT = 10; // (UNITS: pixels)
+    public static final double PLATFORM_MOVING_SPEED = 0.33; // (UNITS: pixels/second)
+    public static final int INITIAL_PLATFORM_COUNT = 10;
+    public static final int MAX_PLATFORMS = 10;
     public static final int DOODLE_WIDTH = 20; // (UNITS: pixels)
     public static final int DOODLE_HEIGHT = 40; // (UNITS: pixels)
     public static final int DOODLE_X = 200;
