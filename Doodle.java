@@ -1,140 +1,142 @@
 package doodlejump;
 
-
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.util.Duration;
+import javafx.event.ActionEvent;
+import javafx.scene.input.KeyEvent;
 
-public class Doodle {
-    private Rectangle doodle;
-    private Circle doodleLeftEye;
-    private Circle doodleRightEye;
-    private Rectangle doodleLeftEyeBrow;
-    private Rectangle doodleRightEyeBrow;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-    private double currentVelocity = 0.0;
-    private  double currentPosition;
+public class Game {
+    private Pane doodlePane;
+    private Doodle doodle;
+    private List<Platform> platforms;
+    private boolean isGameOver;
+    private int score;
+    private Timeline timeline;
+    private static final double SCROLLING_THRESHOLD = Constants.SCENE_HEIGHT / 2;
 
-    public Doodle(BorderPane root, Pane doodlePane) {
-        this.doodle = this.createRectangle(Constants.DOODLE_X,Constants.DOODLE_Y,
-                Constants.DOODLE_WIDTH,Constants.DOODLE_HEIGHT);
-        this.doodleLeftEye = new Circle(Constants.DOODLE_LEFT_EYE_X,Constants.DOODLE_EYE_Y,
-                Constants.DOODLE_EYE_RADIUS,Constants.DOODLE_EYE_COLOR);
-        this.doodleRightEye = new Circle(Constants.DOODLE_RIGHT_EYE_X,Constants.DOODLE_EYE_Y,
-                Constants.DOODLE_EYE_RADIUS,Constants.DOODLE_EYE_COLOR);
-        this.doodleLeftEyeBrow = this.createRectangle(Constants.DOODLE_LEFT_EYE_BROW_X,
-                Constants.DOODLE_EYE_BROW_Y,Constants.DOODLE_EYE_BROW_WIDTH,
-                Constants.DOODLE_EYE_BROW_HEIGHT);
-        this.doodleRightEyeBrow = this.createRectangle(Constants.DOODLE_RIGHT_EYE_BROW_X,
-                Constants.DOODLE_EYE_BROW_Y,Constants.DOODLE_EYE_BROW_WIDTH,
-                Constants.DOODLE_EYE_BROW_HEIGHT);
+    public Game(BorderPane root, Pane doodlePane) {
+        this.doodle = new Doodle(root, doodlePane);
+        this.doodlePane = doodlePane;
+        this.platforms = new ArrayList<>();
+        this.isGameOver = false;
+        this.score = 0;
+        root.setOnKeyPressed(this::handleKeyPress);
 
-        this.doodle.setFill(Color.GREENYELLOW);
-        this.doodleLeftEyeBrow.setFill(Color.HOTPINK);
-        this.doodleRightEyeBrow.setFill(Color.BLUE);
-
-        doodlePane.getChildren().addAll(this.doodle,this.doodleLeftEye,this.doodleRightEye,
-                this.doodleLeftEyeBrow,this.doodleRightEyeBrow);
+        this.startTimeline();
+        generateInitialPlatforms();
     }
 
-    private Rectangle createRectangle(double x,double y,double width,double height){
-        return new Rectangle(x,y,width,height);
-    }
-
-    private void setXLocation(double x) {
-        this.doodle.setX(x);
-        this.doodleLeftEye.setCenterX(x + Constants.LEFT_EYE_OFFSET);
-        this.doodleRightEye.setCenterX(x + Constants.RIGHT_EYE_OFFSET);
-        this.doodleLeftEyeBrow.setX(x + Constants.LEFT_EYE_BROW_OFFSET);
-        this.doodleRightEyeBrow.setX(x + Constants.RIGHT_EYE_BROW_OFFSET);
-    }
-
-    private void setYLocation(double y) {
-        this.doodle.setY(y);
-        this.doodleLeftEye.setCenterY(y + Constants.EYE_OFFSET_Y);
-        this.doodleRightEye.setCenterY(y + Constants.EYE_OFFSET_Y);
-        this.doodleLeftEyeBrow.setY(y + Constants.EYE_BROW_OFFSET_Y);
-        this.doodleRightEyeBrow.setY(y + Constants.EYE_BROW_OFFSET_Y);
-    }
-
-    public void doodleFall() {
-        double doodleY = this.doodle.getY();
-        this.setYLocation(doodleY);
-
-        double updatedVelocity = this.currentVelocity + Constants.GRAVITY * Constants.DURATION;
-        double updatedPosition = this.currentPosition + updatedVelocity * Constants.DURATION;
-
-        this.doodle.setY(updatedPosition);
-
-        this.currentVelocity = updatedVelocity;
-        this.currentPosition = updatedPosition;
-    }
-
-    private double getXLocation() {
-        return this.doodle.getX();
-    }
-
-    public void moveLeft(){
-        this.setXLocation(this.doodle.getX() - Constants.DISTANCE_X);
-
-    }
-
-    public void moveRight(){
-        this.setXLocation(this.doodle.getX() + Constants.DISTANCE_X);
-    }
-
-    public void rebound(){
-        this.currentVelocity = Constants.REBOUND_VELOCITY;
-    }
-    public void resetPosition(){
-        if (this.getXLocation() > Constants.SCENE_WIDTH - (double) Constants.DOODLE_WIDTH /2){
-            this.doodle.setX((double) -Constants.DOODLE_WIDTH /2);
-        }
-        if (this.getXLocation() < -(double) Constants.DOODLE_WIDTH /2){
-            this.doodle.setX(Constants.SCENE_WIDTH - (double) Constants.DOODLE_WIDTH /2);
-        }
-    }
-
-    public boolean intersects(double x,double y, double width, double height){
-        double doodleX = this.doodle.getX();
-        double doodleY = this.doodle.getY();
-        double doodleWidth = Constants.DOODLE_WIDTH;
-        double doodleHeight = Constants.DOODLE_HEIGHT;
-
-        // Check if the doodle overlaps with the platform
-        if (doodleX < x + width &&
-                doodleX + doodleWidth > x &&
-                doodleY < y + height &&
-                doodleY + doodleHeight > y) {
-            // Collision detected, make the doodle jump
-            this.currentVelocity = Constants.REBOUND_VELOCITY;
-            return true;
-        }
-
-        else return false;
-    }
-
-    public void checkCollisionWithPlatform(Platform platform) {
-        if (this.intersects(platform.getX(), platform.getY(), platform.getWidth(), platform.getHeight())) {
-            switch (platform.getType()) {
-                case STANDARD:
-                    this.currentVelocity = Constants.REBOUND_VELOCITY;
+    private void handleKeyPress(KeyEvent e) {
+        if (!isGameOver) {
+            KeyCode keyPressed = e.getCode();
+            switch (keyPressed) {
+                case LEFT:
+                    this.doodle.moveLeft();
                     break;
-                case DISAPPEARING:
-                    this.currentVelocity = Constants.REBOUND_VELOCITY;
-                    platform.hide(); // Implement this method to hide the platform
+                case RIGHT:
+                    this.doodle.moveRight();
                     break;
-                case EXTRA_BOUNCY:
-                    this.currentVelocity = Constants.BOUNCY_REBOUND_VELOCITY;
-                    break;
-                case MOVING:
-                    // Handle moving platform collision
-                    this.currentVelocity = Constants.REBOUND_VELOCITY;
+                default:
                     break;
             }
+            e.consume();
         }
     }
 
+    private void startTimeline() {
+        KeyFrame kf = new KeyFrame(Duration.millis(16),
+                (ActionEvent e) -> {
+                    if (!isGameOver) {
+                        System.out.println("Doodle Position - X: " + this.doodle.getXLocation() + ", Y: " + this.doodle.getYLocation());
+                        this.doodle.doodleFall();
+                        this.doodle.resetPosition();
+                        checkForScrolling();
+
+                        for (Platform platform : platforms) {
+                            platform.update();
+                            if (this.doodle.checkCollisionWithPlatform(platform)) {
+                                score++;
+                            }
+                        }
+
+                        if (this.doodle.getYLocation() > Constants.GAME_OVER_Y_THRESHOLD) {
+                            gameOver();
+                        }
+                    }
+                });
+        Timeline timeline = new Timeline(kf);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    private void checkForScrolling() {
+        if (doodle.getYLocation() < SCROLLING_THRESHOLD) {
+            double scrollAmount = SCROLLING_THRESHOLD - doodle.getYLocation();
+            scrollPlatforms(scrollAmount);
+            doodle.adjustYPosition(scrollAmount);
+        }
+    }
+
+    private void scrollPlatforms(double scrollAmount) {
+        Iterator<Platform> iterator = platforms.iterator();
+        while (iterator.hasNext()) {
+            Platform platform = iterator.next();
+            platform.setY(platform.getY() + scrollAmount);
+
+            if (platform.getY() > Constants.SCENE_HEIGHT) {
+                platform.removeFromPane();
+                iterator.remove();
+            }
+        }
+
+        while (platforms.size() < Constants.MAX_PLATFORMS) {
+            generateNewPlatformAtTop();
+        }
+    }
+
+
+    private void generateInitialPlatforms() {
+        for (int i = 0; i < Constants.INITIAL_PLATFORM_COUNT; i++) {
+            double x = Math.random() * (Constants.SCENE_WIDTH - Constants.PLATFORM_WIDTH);
+            double y = Math.random() * Constants.SCENE_HEIGHT;
+
+            Platform.PlatformType type = Platform.getRandomPlatformType();
+            Platform platform = new Platform(null, this.doodlePane, x, y, type);
+            platforms.add(platform);
+        }
+    }
+
+    private void generateNewPlatformAtTop() {
+        double x = Math.random() * (Constants.SCENE_WIDTH - Constants.PLATFORM_WIDTH);
+        double y = -Constants.PLATFORM_HEIGHT;
+
+        Platform.PlatformType randomType = Platform.PlatformType.values()[(int) (Math.random() * Platform.PlatformType.values().length)];
+        Platform newPlatform = new Platform(null, this.doodlePane, x, y, randomType);
+        platforms.add(newPlatform);
+    }
+
+    private void gameOver() {
+        isGameOver = true;
+        if (timeline != null) {
+            timeline.stop();
+        }
+
+        if (doodlePane != null) {
+            Label gameOverLabel = new Label("Game Over! Score: " + score);
+            gameOverLabel.setFont(new Font("Arial", 24));
+            doodlePane.getChildren().add(gameOverLabel);
+            doodlePane.setOnKeyPressed(null);
+        }
+    }
 }
